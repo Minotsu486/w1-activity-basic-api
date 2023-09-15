@@ -26,27 +26,28 @@ const startItem ={
     quantity: 12,
     purchased: false
 };
-/*function getGroceryList()
+groceryList.push(startItem);
+function getGroceryList()
 {
     return groceryList;
 }
-function setGroceryList(groceryList)
+function addGroceryList(grocery)
 {
-    this.groceryList = groceryList;
-}*/
+    groceryList.push(grocery);
+    return true;
+}
 function closeServer()
 {
     server.close();
 }
-groceryList.push(startItem);
 const server = http.createServer((req, res) => {
 
     // GET
     if (req.method === 'GET' && req.url === '/api/list'){
-        
         logger.info('Successful GET')
         res.writeHead(200, { 'Content-Type': 'application/json'});
-        res.end(JSON.stringify(groceryList));
+        res.end(JSON.stringify(getGroceryList));
+        
     //POST
     }else if(req.method === 'POST' && req.url === '/api/addToList'){
         let body = '';
@@ -55,10 +56,16 @@ const server = http.createServer((req, res) => {
         });
         req.on('end', () => {
             const data = JSON.parse(body);
-            groceryList.push(data);
-            logger.info(`Successful POST`);
-            res.writeHead(201, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Resource Created Successfully!'}));
+            if(addGroceryList(data))
+            {
+                logger.info(`Successful POST`);
+                res.writeHead(201, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({message: 'Resource Created Successfully!'}));
+            }else{
+                logger.info(`Failed POST`);
+                res.writeHead(400, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({message: 'Resource Failed to be Created!'}));
+            }
         });
 
     }else if(req.method === "PUT" && req.url === '/api/update'){
@@ -67,9 +74,9 @@ const server = http.createServer((req, res) => {
             body += chunk;
         });
         req.on('end', () => {
-            const newItem = JSON.parse(body);
+            const data = JSON.parse(body);
 
-            if(modifyList(newItem))
+            if(modifyList(data))
             {
                 logger.info(`Successful PUT`);
                 res.writeHead(200, {'Content-Type': 'application/json'});
@@ -90,8 +97,8 @@ const server = http.createServer((req, res) => {
             body += chunk;
         });
         req.on('end', () => {
-            const newItem = JSON.parse(body);
-            if(delListItem(newItem))
+            const data = JSON.parse(body);
+            if(delListItem(data))
             {
                 logger.info(`Successful DELETE`);
                 res.writeHead(200, {'Content-Type': 'application/json'});
@@ -173,4 +180,4 @@ function delListItem(grocery)
     }
     return false;
 }
-module.exports = {closeServer};
+module.exports = {getGroceryList,closeServer,addGroceryList,modifyList,delListItem};
