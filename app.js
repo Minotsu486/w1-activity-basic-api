@@ -14,14 +14,7 @@ const logger = createLogger({
         new transports.File({ filename: 'app.log'}), // log to a file
     ]
 })
-/*
-logger.info('What rolls down stairs');
-logger.info('alone or in pairs,');
-logger.info('and over your neighbors dog?');
-logger.warn('Whats great for a snack,');
-logger.info('And fits on your back?');
-logger.error('Its log, log, log');
-*/
+
 
 const http = require("http");
 const url = require('node:url');
@@ -33,6 +26,18 @@ const startItem ={
     quantity: 12,
     purchased: false
 };
+/*function getGroceryList()
+{
+    return groceryList;
+}
+function setGroceryList(groceryList)
+{
+    this.groceryList = groceryList;
+}*/
+function closeServer()
+{
+    server.close();
+}
 groceryList.push(startItem);
 const server = http.createServer((req, res) => {
 
@@ -168,3 +173,4 @@ function delListItem(grocery)
     }
     return false;
 }
+module.exports = {closeServer};
